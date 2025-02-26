@@ -8,13 +8,17 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -23,54 +27,50 @@ public class GlobalExceptionHandler {
 
     private final MessageSource messageSource;
 
+    private List<String> getDefaultErrorList(Exception ex) {
+        return ex.getMessage() != null ? List.of(ex.getMessage()) : Collections.emptyList();
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleEntityNotFoundException(EntityNotFoundException ex) {
-        String message = messageSource.getMessage(ex.getMessageCode(), ex.getArgs(),
+        String message = messageSource.getMessage(
+                ex.getMessageCode(), ex.getArgs(),
                 "Entity not found", LocaleContextHolder.getLocale());
-
-        log.warn("Entity not found: {} with code: {}", message, ex.getMessageCode());
-        return new ErrorResponse(message);
+        assert message != null;
+        return new ErrorResponse(message, List.of(message), LocalDateTime.now());
     }
-
-//    @ExceptionHandler(AccessDeniedException.class)
-//    @ResponseStatus(HttpStatus.FORBIDDEN)
-//    public ErrorResponse handleAccessDeniedException(AccessDeniedException ex) {
-//        String message = messageSource.getMessage("access.denied", null,
-//                "Access denied", LocaleContextHolder.getLocale());
-//
-//        log.warn("Access denied: {}", ex.getMessage());
-//        return new ErrorResponse(message);
-//    }
 
     @ExceptionHandler(ServiceException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleServiceException(ServiceException ex) {
-        String message = messageSource.getMessage(ex.getMessageCode(), ex.getArgs(),
+        String message = messageSource.getMessage(
+                ex.getMessageCode(), ex.getArgs(),
                 "Service error occurred", LocaleContextHolder.getLocale());
-
-        ErrorResponse response = new ErrorResponse(message);
         log.error("Service exception: {} with code: {}", message, ex.getMessageCode(), ex);
-        return response;
+
+        // Разрешаем ключ ошибки в текстовое сообщение
+        String resolvedError = messageSource.getMessage(
+                ex.getMessageCode(), ex.getArgs(),
+                ex.getMessageCode(), LocaleContextHolder.getLocale());
+
+        assert resolvedError != null;
+        return new ErrorResponse(message, List.of(resolvedError), LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(MethodArgumentNotValidException ex) {
-        List<String> errors = ex.getBindingResult()
-                .getFieldErrors()
+        List<String> errors = ex.getBindingResult().getFieldErrors()
                 .stream()
-                .map(error -> messageSource.getMessage(Objects.requireNonNull(error.getDefaultMessage()), null,
-                        error.getDefaultMessage(), LocaleContextHolder.getLocale()))
-                .toList();
+                .map(error -> messageSource.getMessage(
+                        Objects.requireNonNull(error.getDefaultMessage()), null, error.getDefaultMessage(), LocaleContextHolder.getLocale()))
+                .collect(Collectors.toList());
 
-        String message = messageSource.getMessage("validation.error", null,
-                "Validation failed", LocaleContextHolder.getLocale());
-
-        ErrorResponse response = new ErrorResponse(message);
-        response.setErrors(errors);
+        String message = messageSource.getMessage(
+                "validation.error", null, "Validation failed", LocaleContextHolder.getLocale());
         log.warn("Validation error: {}", errors);
-        return response;
+        return new ErrorResponse(message, errors, LocalDateTime.now());
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -78,47 +78,31 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleConstraintViolationException(ConstraintViolationException ex) {
         List<String> errors = ex.getConstraintViolations()
                 .stream()
-                .map(violation -> messageSource.getMessage(violation.getMessage(), null,
-                        violation.getMessage(), LocaleContextHolder.getLocale()))
-                .toList();
+                .map(violation -> messageSource.getMessage(
+                        violation.getMessage(), null, violation.getMessage(), LocaleContextHolder.getLocale()))
+                .collect(Collectors.toList());
 
-        String message = messageSource.getMessage("validation.error", null,
-                "Validation failed", LocaleContextHolder.getLocale());
-
-        ErrorResponse response = new ErrorResponse(message);
-        response.setErrors(errors);
+        String message = messageSource.getMessage(
+                "validation.error", null, "Validation failed", LocaleContextHolder.getLocale());
         log.warn("Constraint violation: {}", errors);
-        return response;
-    }
-
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        String message = messageSource.getMessage("data.integrity.violation", null,
-                "Data integrity violation", LocaleContextHolder.getLocale());
-
-        log.error("Data integrity violation: {}", ex.getMessage());
-        return new ErrorResponse(message);
+        return new ErrorResponse(message, errors, LocalDateTime.now());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        String message = messageSource.getMessage("message.not.readable", null,
-                "Invalid request format", LocaleContextHolder.getLocale());
-
+        String message = messageSource.getMessage(
+                "message.not.readable", null, "Invalid request format", LocaleContextHolder.getLocale());
         log.warn("Message not readable: {}", ex.getMessage());
-        return new ErrorResponse(message);
+        return new ErrorResponse(message, getDefaultErrorList(ex), LocalDateTime.now());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGenericException(Exception ex) {
-        String message = messageSource.getMessage("error.general", null,
-                "An unexpected error occurred", LocaleContextHolder.getLocale());
-
-        ErrorResponse response = new ErrorResponse(message);
+        String message = messageSource.getMessage(
+                "error.general", null, "An unexpected error occurred", LocaleContextHolder.getLocale());
         log.error("Unexpected exception: ", ex);
-        return response;
+        return new ErrorResponse(message, getDefaultErrorList(ex), LocalDateTime.now());
     }
 }
