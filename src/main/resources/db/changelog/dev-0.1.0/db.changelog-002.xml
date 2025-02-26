@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Вставка тестовых данных в таблицу users -->
+    <changeSet id="1" author="dev">
+        <insert tableName="users" schemaName="management_system">
+            <column name="email" value="admin@example.com"/>
+            <column name="password" value="admin_password"/>
+        </insert>
+        <insert tableName="users" schemaName="management_system">
+            <column name="email" value="user@example.com"/>
+            <column name="password" value="user_password"/>
+        </insert>
+    </changeSet>
+
+    <!-- Вставка тестовых данных в таблицу roles -->
+    <changeSet id="2" author="dev">
+        <insert tableName="roles" schemaName="management_system">
+            <column name="name" value="ADMIN"/>
+        </insert>
+        <insert tableName="roles" schemaName="management_system">
+            <column name="name" value="USER"/>
+        </insert>
+    </changeSet>
+
+    <!-- Вставка тестовых данных в таблицу user_roles -->
+    <changeSet id="3" author="dev">
+        <insert tableName="user_roles" schemaName="management_system">
+            <column name="user_id" value="1"/>
+            <column name="role_id" value="1"/>
+        </insert>
+        <insert tableName="user_roles" schemaName="management_system">
+            <column name="user_id" value="2"/>
+            <column name="role_id" value="2"/>
+        </insert>
+    </changeSet>
+
+    <!-- Вставка тестовых данных в таблицу tasks -->
+    <changeSet id="4" author="dev">
+        <insert tableName="tasks" schemaName="management_system">
+            <column name="title" value="Fix Bug in Payment System"/>
+            <column name="description" value="Fix critical bug in the payment gateway."/>
+            <column name="status" value="IN_PROGRESS"/>
+            <column name="priority" value="HIGH"/>
+            <column name="author_id" value="1"/>
+            <column name="assignee_id" value="2"/>
+        </insert>
+        <insert tableName="tasks" schemaName="management_system">
+            <column name="title" value="Implement User Registration"/>
+            <column name="description" value="Develop registration feature for new users."/>
+            <column name="status" value="PENDING"/>
+            <column name="priority" value="MEDIUM"/>
+            <column name="author_id" value="1"/>
+            <column name="assignee_id" value="2"/>
+        </insert>
+    </changeSet>
+
+    <!-- Вставка тестовых данных в таблицу comments -->
+    <changeSet id="5" author="dev">
+        <insert tableName="comments" schemaName="management_system">
+            <column name="content" value="This is a critical issue that needs immediate attention."/>
+            <column name="author_id" value="1"/>
+            <column name="task_id" value="1"/>
+        </insert>
+        <insert tableName="comments" schemaName="management_system">
+            <column name="content" value="Waiting for approval from the product team."/>
+            <column name="author_id" value="2"/>
+            <column name="task_id" value="2"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

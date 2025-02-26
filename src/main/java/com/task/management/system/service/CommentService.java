@@ -1,0 +1,37 @@
+package com.task.management.system.service;
+
+import com.task.management.system.mapper.CommentMapper;
+import com.task.management.system.model.dto.CommentDto;
+import com.task.management.system.model.dto.CreateCommentDto;
+import com.task.management.system.model.entity.Comment;
+import com.task.management.system.model.entity.Task;
+import com.task.management.system.model.entity.User;
+import com.task.management.system.repository.CommentRepository;
+import com.task.management.system.repository.TaskRepository;
+import com.task.management.system.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.security.Principal;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class CommentService {
+    private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
+    private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
+
+    @Transactional
+    public void addComment(CreateCommentDto commentDto, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName());
+        Task task = taskRepository.getReferenceById(commentDto.getTaskId());
+        Comment comment = commentMapper.createDtoToEntity(commentDto);
+        comment.setAuthor(user);
+        comment.setTask(task);
+        commentRepository.save(comment);
+    }
+}

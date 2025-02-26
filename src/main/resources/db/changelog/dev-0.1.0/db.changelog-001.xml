@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Таблица пользователей -->
+    <changeSet id="1" author="dev">
+        <createTable tableName="users" schemaName="management_system">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Таблица ролей -->
+    <changeSet id="2" author="dev">
+        <createTable tableName="roles" schemaName="management_system">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Таблица связи пользователей и ролей -->
+    <changeSet id="3" author="dev">
+        <createTable tableName="user_roles" schemaName="management_system">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+
+    <!-- Таблица задач -->
+    <changeSet id="4" author="dev">
+        <createTable tableName="tasks" schemaName="management_system">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author_id" type="BIGINT"/>
+            <column name="assignee_id" type="BIGINT"/>
+        </createTable>
+        <!-- Внешний ключ для автора -->
+        <addForeignKeyConstraint
+                baseTableName="tasks"
+                baseColumnNames="author_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                baseTableSchemaName="management_system"
+                referencedTableSchemaName="management_system"
+                constraintName="fk_tasks_author"
+        />
+        <!-- Внешний ключ для исполнителя -->
+        <addForeignKeyConstraint
+                baseTableName="tasks"
+                baseColumnNames="assignee_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                baseTableSchemaName="management_system"
+                referencedTableSchemaName="management_system"
+                constraintName="fk_tasks_assignee" />
+    </changeSet>
+
+    <!-- Таблица комментариев -->
+    <changeSet id="5" author="dev">
+        <createTable tableName="comments" schemaName="management_system">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <!-- Внешний ключ для автора комментария -->
+        <addForeignKeyConstraint
+                baseTableName="comments"
+                baseColumnNames="author_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                baseTableSchemaName="management_system"
+                referencedTableSchemaName="management_system"
+                constraintName="fk_comments_author" />
+
+        <!-- Внешний ключ для задачи -->
+        <addForeignKeyConstraint
+                baseTableName="comments"
+                baseColumnNames="task_id"
+                referencedTableName="tasks"
+                referencedColumnNames="id"
+                baseTableSchemaName="management_system"
+                referencedTableSchemaName="management_system"
+                constraintName="fk_comments_task" />
+    </changeSet>
+</databaseChangeLog>
