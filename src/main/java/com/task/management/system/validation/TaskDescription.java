@@ -7,12 +7,12 @@ import jakarta.validation.constraints.Size;
 
 import java.lang.annotation.*;
 
-@NotBlank(message = "{task.description.blank}") // Описание не должно быть пустым
-@Size(max = 2000, message = "{task.description.size}") // Максимальная длина 2000 символов
+@NotBlank(message = "{task.description.blank}")
+@Size(max = 2000, message = "{task.description.size}")
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Constraint(validatedBy = {}) // Используем стандартные валидаторы
+@Constraint(validatedBy = {})
 public @interface TaskDescription {
     String message() default "{task.description.invalid}";
     Class<?>[] groups() default {};

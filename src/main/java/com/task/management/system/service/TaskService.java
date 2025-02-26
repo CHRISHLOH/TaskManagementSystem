@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,7 @@ public class TaskService {
     private final CommentMapper commentMapper;
 
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public void createTask(TaskDto taskDto) {
         try {
             Task task = taskMapper.toEntity(taskDto);
@@ -57,6 +59,7 @@ public class TaskService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and @taskSecurity.isAuthor(authentication.name)")
     public void editTask(TaskDto taskDto) {
         Task taskFromDb = taskRepository.findTaskByIdWithUsers(taskDto.getId());
         if (taskFromDb == null) {
@@ -85,6 +88,7 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public TaskDto getTaskById(Long taskId) {
         Task task = taskRepository.findTaskByIdWithUsers(taskId);
         if (task == null) {
@@ -105,6 +109,7 @@ public class TaskService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and @taskSecurity.isAuthor(authentication.name)")
     public void deleteTaskById(Long taskId) {
         if (!taskRepository.existsById(taskId)) {
             log.warn("Task not found for deletion with ID: {}", taskId);
@@ -122,6 +127,7 @@ public class TaskService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and taskSecurity.isAssignee(principal.name)")
     public void changeTaskStatus(Long taskId, Status status, Principal principal) {
         if (!taskRepository.existsById(taskId)) {
             log.warn("Task not found for status change with ID: {}", taskId);
@@ -137,6 +143,7 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public List<TaskDto> getAllTasks(Pageable pageable, TaskFilter taskFilter) {
             Specification<Task> specification = withFilters(taskFilter);
             List<TaskDto> taskList = taskMapper.listToDtoList(taskRepository.findAll(specification, pageable).getContent());

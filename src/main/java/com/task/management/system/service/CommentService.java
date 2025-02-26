@@ -1,5 +1,7 @@
 package com.task.management.system.service;
 
+import com.task.management.system.exception.EntityNotFoundException;
+import com.task.management.system.exception.ServiceException;
 import com.task.management.system.mapper.CommentMapper;
 import com.task.management.system.model.dto.CommentDto;
 import com.task.management.system.model.dto.CreateCommentDto;
@@ -11,6 +13,7 @@ import com.task.management.system.repository.TaskRepository;
 import com.task.management.system.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,12 +29,21 @@ public class CommentService {
     private final TaskRepository taskRepository;
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and taskSecurity.isAssignee(principal.name)")
     public void addComment(CreateCommentDto commentDto, Principal principal) {
         User user = userRepository.findByEmail(principal.getName());
-        Task task = taskRepository.getReferenceById(commentDto.getTaskId());
-        Comment comment = commentMapper.createDtoToEntity(commentDto);
-        comment.setAuthor(user);
-        comment.setTask(task);
-        commentRepository.save(comment);
+        if(user == null) {
+            throw new EntityNotFoundException("user.not.found");
+        }
+        try {
+            Task task = taskRepository.getReferenceById(commentDto.getTaskId());
+            Comment comment = commentMapper.createDtoToEntity(commentDto);
+            comment.setAuthor(user);
+            comment.setTask(task);
+            commentRepository.save(comment);
+        } catch (RuntimeException e) {
+            log.error("Unexpected error while retrieving task", e);
+            throw new ServiceException("user.nor.assignee", e);
+        }
     }
 }
