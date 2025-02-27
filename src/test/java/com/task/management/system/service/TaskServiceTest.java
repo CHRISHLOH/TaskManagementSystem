@@ -57,7 +57,6 @@ public class TaskServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Инициализация тестовых объектов
         User sampleUser = new User();
         sampleUser.setId(1L);
         sampleUser.setEmail("user@example.com");
@@ -76,7 +75,7 @@ public class TaskServiceTest {
         sampleTaskDto.setId(1L);
         sampleTaskDto.setTitle("Test Task");
         sampleTaskDto.setDescription("Test Description");
-        sampleTaskDto.setStatus("В ожидании");   // строковое представление, которое маппер преобразует в Status
+        sampleTaskDto.setStatus("В ожидании");
         sampleTaskDto.setPriority("Средняя");
         UserDto userDto = new UserDto();
         userDto.setId(1L);
@@ -96,9 +95,7 @@ public class TaskServiceTest {
 
     @Test
     void testCreateTask() {
-        // when: маппер преобразует TaskDto в сущность Task
         when(taskMapper.toEntity(sampleTaskDto)).thenReturn(sampleTask);
-        // when: репозиторий сохраняет задачу и возвращает её
         when(taskRepository.save(sampleTask)).thenReturn(sampleTask);
 
         taskService.createTask(sampleTaskDto);
