@@ -5,7 +5,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <!-- Таблица пользователей -->
     <changeSet id="1" author="dev">
         <createTable tableName="users" schemaName="management_system">
             <column name="id" type="BIGINT" autoIncrement="true">
@@ -20,7 +19,6 @@
         </createTable>
     </changeSet>
 
-    <!-- Таблица ролей -->
     <changeSet id="2" author="dev">
         <createTable tableName="roles" schemaName="management_system">
             <column name="id" type="BIGINT" autoIncrement="true">
@@ -32,7 +30,6 @@
         </createTable>
     </changeSet>
 
-    <!-- Таблица связи пользователей и ролей -->
     <changeSet id="3" author="dev">
         <createTable tableName="user_roles" schemaName="management_system">
             <column name="user_id" type="BIGINT">
@@ -45,7 +42,6 @@
 
     </changeSet>
 
-    <!-- Таблица задач -->
     <changeSet id="4" author="dev">
         <createTable tableName="tasks" schemaName="management_system">
             <column name="id" type="BIGINT" autoIncrement="true">
@@ -64,7 +60,6 @@
             <column name="author_id" type="BIGINT"/>
             <column name="assignee_id" type="BIGINT"/>
         </createTable>
-        <!-- Внешний ключ для автора -->
         <addForeignKeyConstraint
                 baseTableName="tasks"
                 baseColumnNames="author_id"
@@ -74,7 +69,6 @@
                 referencedTableSchemaName="management_system"
                 constraintName="fk_tasks_author"
         />
-        <!-- Внешний ключ для исполнителя -->
         <addForeignKeyConstraint
                 baseTableName="tasks"
                 baseColumnNames="assignee_id"
@@ -85,7 +79,6 @@
                 constraintName="fk_tasks_assignee" />
     </changeSet>
 
-    <!-- Таблица комментариев -->
     <changeSet id="5" author="dev">
         <createTable tableName="comments" schemaName="management_system">
             <column name="id" type="BIGINT" autoIncrement="true">
@@ -101,7 +94,6 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <!-- Внешний ключ для автора комментария -->
         <addForeignKeyConstraint
                 baseTableName="comments"
                 baseColumnNames="author_id"
@@ -111,7 +103,6 @@
                 referencedTableSchemaName="management_system"
                 constraintName="fk_comments_author" />
 
-        <!-- Внешний ключ для задачи -->
         <addForeignKeyConstraint
                 baseTableName="comments"
                 baseColumnNames="task_id"

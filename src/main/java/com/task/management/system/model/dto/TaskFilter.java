@@ -1,7 +1,5 @@
 package com.task.management.system.model.dto;
 
-import com.task.management.system.enums.Priority;
-import com.task.management.system.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

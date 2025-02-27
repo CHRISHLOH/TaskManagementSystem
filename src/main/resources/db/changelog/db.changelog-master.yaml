@@ -3,4 +3,6 @@ databaseChangeLog:
       file: db/changelog/dev-0.1.0/db.changelog-001.xml
   - include:
       file: db/changelog/dev-0.1.0/db.changelog-002.xml
+  - include:
+      file: db/changelog/dev-0.1.0/db.changelog-003.xml
 

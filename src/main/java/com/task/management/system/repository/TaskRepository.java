@@ -22,22 +22,6 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
     @Query("DELETE FROM Task t WHERE t.id = :taskId")
     void deleteTaskById(@Param("taskId") Long taskId);
 
-    @Query("SELECT t FROM Task t " +
-            "LEFT JOIN FETCH t.author " +
-            "LEFT JOIN FETCH t.assignee " +
-            "WHERE t.author.email = :email")
-    Task findTaskByUserEmail(@Param("email") String email);
-
-    @Query("""
-            SELECT CASE WHEN COUNT(t) > 0
-            THEN true
-            ELSE false
-            END FROM Task t
-            WHERE t.author.email = :userEmail
-
-    """)
-    boolean isAuthorOfTask(@Param("userEmail") String userEmail);
-
     boolean existsByAssignee_Email(String userEmail);
 
     boolean existsByAuthor_Email(String userEmail);

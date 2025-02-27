@@ -150,8 +150,37 @@ public class UserController {
                             array = @ArraySchema(schema = @Schema(implementation = TaskDto.class))))
     })
     @PutMapping("/tasks/{id}/status")
-    public ResponseEntity<Void> updateTaskStatus(@PathVariable Long id, @RequestBody Map<String, String> requestBody, Principal principal) {
+    public ResponseEntity<String> updateTaskStatus(@PathVariable Long id, @RequestBody Map<String, String> requestBody, Principal principal) {
         taskService.changeTaskStatus(id, Status.fromDisplayName(requestBody.get("status")), principal);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Status updated");
+    }
+
+    @Operation(summary = "Получить все задачи",
+            description = "Возвращает список всех задач с поддержкой пагинации и фильтрации")
+    @Parameters({
+            @Parameter(name = "page", description = "Номер страницы", example = "0"),
+            @Parameter(name = "size", description = "Размер страницы", example = "10"),
+            @Parameter(name = "status", description = "Статус задачи", schema = @Schema(implementation = Status.class)),
+            @Parameter(name = "priority", description = "Приоритет задачи", schema = @Schema(implementation = Priority.class)),
+            @Parameter(name = "author", description = "Автор задачи", example = "user1"),
+            @Parameter(name = "assignee", description = "Исполнитель задачи", example = "user2")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Список задач успешно возвращен",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = TaskDto.class))))
+    })
+    @GetMapping("/task/all")
+    public ResponseEntity<List<TaskDto>> getAllTasks(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "priority", required = false) String priority,
+            @RequestParam(value = "author", required = false) String author,
+            @RequestParam(value = "assignee", required = false) String assignee
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        TaskFilter taskFilter = new TaskFilter(status, priority, author, assignee);
+        return ResponseEntity.ok(taskService.getAllTasks(pageable, taskFilter));
     }
 }

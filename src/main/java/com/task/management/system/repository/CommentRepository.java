@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
@@ -26,20 +25,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             DELETE FROM Comment c WHERE c.task.id = :taskId
             """)
     void deleteCommentsByTaskId(@Param("taskId") Long taskId);
-
-    @Query("""
-        SELECT c FROM Comment c
-        LEFT JOIN FETCH c.author
-        WHERE c.id = :id
-        """)
-    Optional<Comment> findCommentById(@Param("id") Long id);
-
-    @Query("""
-            SELECT c FROM Comment c
-            LEFT JOIN FETCH c.author
-            WHERE c.author.email = :email
-            """)
-    List<Comment> findTaskByUserEmail(@Param("email") String email);
 
     @Query("""
     SELECT

@@ -35,6 +35,7 @@ services:
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./src/main/resources/db/changelog/preliquidbase/createdbschema.sql:/docker-entrypoint-initdb.d/create_schema.sql
     ports:
       - "5432:5432"
   app:

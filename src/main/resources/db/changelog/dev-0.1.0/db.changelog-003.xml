@@ -1,0 +1,20 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <changeSet id="create-t_deactivated_token" author="your_name">
+        <createTable tableName="t_deactivated_token" schemaName="management_system">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="c_keep_until" type="TIMESTAMP" />
+        </createTable>
+        <sql>
+            ALTER TABLE management_system.t_deactivated_token
+                ADD CONSTRAINT chk_c_keep_until CHECK (c_keep_until > now());
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

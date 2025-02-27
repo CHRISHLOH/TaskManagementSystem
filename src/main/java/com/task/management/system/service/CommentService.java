@@ -3,7 +3,6 @@ package com.task.management.system.service;
 import com.task.management.system.exception.EntityNotFoundException;
 import com.task.management.system.exception.ServiceException;
 import com.task.management.system.mapper.CommentMapper;
-import com.task.management.system.model.dto.CommentDto;
 import com.task.management.system.model.dto.CreateCommentDto;
 import com.task.management.system.model.entity.Comment;
 import com.task.management.system.model.entity.Task;

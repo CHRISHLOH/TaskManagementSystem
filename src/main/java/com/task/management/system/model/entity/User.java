@@ -1,7 +1,6 @@
 package com.task.management.system.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.task.management.system.configuration.security.Token;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

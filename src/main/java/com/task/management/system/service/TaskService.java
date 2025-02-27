@@ -17,7 +17,6 @@ import com.task.management.system.model.entity.User;
 import com.task.management.system.repository.CommentRepository;
 import com.task.management.system.repository.TaskRepository;
 import com.task.management.system.repository.UserRepository;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
