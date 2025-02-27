@@ -21,9 +21,6 @@ class UserControllerTest {
     @Mock
     private TaskService taskService;
 
-    @Mock
-    private CommentService commentService;
-
     @InjectMocks
     private UserController userController;
 

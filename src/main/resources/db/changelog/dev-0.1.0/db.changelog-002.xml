@@ -8,11 +8,11 @@
     <changeSet id="1" author="dev">
         <insert tableName="users" schemaName="management_system">
             <column name="email" value="admin@example.com"/>
-            <column name="password" value="admin_password"/>
+            <column name="password" value="$2a$12$njI8qDEdpbwWBKjM7N8b1ebLu79m4fd5XhzHintijxucyvMN0SE8O"/>
         </insert>
         <insert tableName="users" schemaName="management_system">
             <column name="email" value="user@example.com"/>
-            <column name="password" value="user_password"/>
+            <column name="password" value="$2a$12$6l62BAQubSmdxUx..e1K5.CVQ2FdRAphWH49w3qWssN7CYcH/hMmG"/>
         </insert>
     </changeSet>
 
