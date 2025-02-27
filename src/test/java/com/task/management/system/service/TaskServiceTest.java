@@ -2,7 +2,6 @@ package com.task.management.system.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -200,12 +199,10 @@ public class TaskServiceTest {
 
     @Test
     void testGetAllTasks() {
-        // Симулируем возврат страницы с одной задачей
         Page<Task> page = new PageImpl<>(List.of(sampleTask));
         when(taskRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
         when(taskMapper.listToDtoList(List.of(sampleTask))).thenReturn(List.of(sampleTaskDto));
 
-        // Симулируем возврат проекций комментариев для задачи
         CommentProjection projection = new CommentProjection() {
             @Override
             public Long getId() { return 1L; }

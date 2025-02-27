@@ -2,7 +2,6 @@ package com.task.management.system.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.security.Principal;
