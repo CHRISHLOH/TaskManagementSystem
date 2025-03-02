@@ -26,7 +26,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,19 +57,15 @@ public class TaskService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and @taskSecurity.isAuthor(authentication.name)")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @taskSecurity.isAuthor(authentication.name, #taskDto.id))")
     public void editTask(TaskDto taskDto) {
         Task taskFromDb = taskRepository.findTaskByIdWithUsers(taskDto.getId());
         if (taskFromDb == null) {
             log.warn("Task not found for editing with ID: {}", taskDto.getId());
             throw new EntityNotFoundException("task.not.found", taskDto.getId());
         }
-        User assignee = null;
-        if (taskDto.getAssignee() != null &&
-                (taskFromDb.getAssignee() == null || !taskFromDb.getAssignee().getId().equals(taskDto.getAssignee().getId()))) {
-            assignee = userRepository.findById(taskDto.getAssignee().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("user.not.found", taskDto.getAssignee().getId()));
-        }
+        User assignee = userRepository.findById(taskDto.getAssignee().getId())
+                .orElseThrow(() -> new EntityNotFoundException("user.not.found", taskDto.getAssignee().getId()));;
         try {
             taskFromDb.setTitle(taskDto.getTitle());
             taskFromDb.setDescription(taskDto.getDescription());
@@ -108,7 +103,7 @@ public class TaskService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and @taskSecurity.isAuthor(authentication.name)")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @taskSecurity.isAuthor(authentication.name, taskId))")
     public void deleteTaskById(Long taskId) {
         if (!taskRepository.existsById(taskId)) {
             log.warn("Task not found for deletion with ID: {}", taskId);
@@ -126,8 +121,8 @@ public class TaskService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and taskSecurity.isAssignee(principal.name)")
-    public void changeTaskStatus(Long taskId, Status status, Principal principal) {
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and @taskSecurity.isAssignee(authentication.name, taskId)")
+    public void changeTaskStatus(Long taskId, Status status) {
         if (!taskRepository.existsById(taskId)) {
             log.warn("Task not found for status change with ID: {}", taskId);
             throw new EntityNotFoundException("task.not.found", taskId);
@@ -142,7 +137,7 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public List<TaskDto> getAllTasks(Pageable pageable, TaskFilter taskFilter) {
             Specification<Task> specification = withFilters(taskFilter);
             List<TaskDto> taskList = taskMapper.listToDtoList(taskRepository.findAll(specification, pageable).getContent());

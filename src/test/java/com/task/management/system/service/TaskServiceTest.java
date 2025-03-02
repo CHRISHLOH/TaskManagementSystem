@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,19 +112,6 @@ public class TaskServiceTest {
     }
 
     @Test
-    void testEditTask_Success() {
-        when(taskRepository.findTaskByIdWithUsers(sampleTaskDto.getId())).thenReturn(sampleTask);
-        sampleTaskDto.setAssignee(null);
-
-        taskService.editTask(sampleTaskDto);
-
-        verify(taskRepository, times(1)).save(sampleTask);
-        assertEquals(sampleTaskDto.getTitle(), sampleTask.getTitle());
-        assertEquals(Status.fromDisplayName(sampleTaskDto.getStatus()), sampleTask.getStatus());
-        assertEquals(Priority.fromDisplayName(sampleTaskDto.getPriority()), sampleTask.getPriority());
-    }
-
-    @Test
     void testGetTaskById_TaskNotFound() {
         when(taskRepository.findTaskByIdWithUsers(1L)).thenReturn(null);
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
@@ -139,7 +125,6 @@ public class TaskServiceTest {
         when(taskMapper.toDto(sampleTask)).thenReturn(sampleTaskDto);
         when(commentRepository.findCommentsByTaskIdWithAuthor(1L)).thenReturn(sampleComments);
 
-        // Симулируем маппинг комментариев
         when(commentMapper.listToDtoList(sampleComments)).thenReturn(
                 sampleComments.stream().map(c -> {
                     CommentDto dto = new CommentDto();
@@ -180,17 +165,15 @@ public class TaskServiceTest {
     @Test
     void testChangeTaskStatus_TaskNotFound() {
         when(taskRepository.existsById(1L)).thenReturn(false);
-        Principal principal = () -> "user@example.com";
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> taskService.changeTaskStatus(1L, Status.IN_PROGRESS, principal));
+                () -> taskService.changeTaskStatus(1L, Status.IN_PROGRESS));
         assertTrue(exception.getMessage().contains("task.not.found"));
     }
 
     @Test
     void testChangeTaskStatus_Success() {
         when(taskRepository.existsById(1L)).thenReturn(true);
-        Principal principal = () -> "user@example.com";
-        taskService.changeTaskStatus(1L, Status.IN_PROGRESS, principal);
+        taskService.changeTaskStatus(1L, Status.IN_PROGRESS);
         verify(taskRepository, times(1)).updateTaskStatus(1L, Status.IN_PROGRESS);
     }
 

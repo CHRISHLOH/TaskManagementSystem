@@ -22,9 +22,8 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
     @Query("DELETE FROM Task t WHERE t.id = :taskId")
     void deleteTaskById(@Param("taskId") Long taskId);
 
-    boolean existsByAssignee_Email(String userEmail);
-
-    boolean existsByAuthor_Email(String userEmail);
+    boolean existsByIdAndAuthor_Email(Long taskId, String email);
+    boolean existsByIdAndAssignee_Email(Long taskId, String email);
 
     @Modifying
     @Query("UPDATE Task t SET t.status = :status WHERE t.id = :taskId")

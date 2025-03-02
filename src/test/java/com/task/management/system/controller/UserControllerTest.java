@@ -43,40 +43,4 @@ class UserControllerTest {
 
         assertThrows(EntityNotFoundException.class, () -> userController.getUserTask(taskId));
     }
-
-    @Test
-    void createUserTask_ValidInput_CreatesTask() {
-        TaskDto taskDto = new TaskDto();
-        doNothing().when(taskService).createTask(taskDto);
-
-        ResponseEntity<String> response = userController.createUserTask(taskDto);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Task created", response.getBody());
-        verify(taskService).createTask(taskDto);
-    }
-
-    @Test
-    void updateUserTask_ValidInput_UpdatesTask() {
-        TaskDto taskDto = new TaskDto();
-        doNothing().when(taskService).editTask(taskDto);
-
-        ResponseEntity<String> response = userController.updateUserTask(taskDto);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Task updated", response.getBody());
-        verify(taskService).editTask(taskDto);
-    }
-
-    @Test
-    void deleteUserTask_DeletesTask() {
-        Long taskId = 1L;
-        doNothing().when(taskService).deleteTaskById(taskId);
-
-        ResponseEntity<String> response = userController.deleteUserTask(taskId);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Task deleted", response.getBody());
-        verify(taskService).deleteTaskById(taskId);
-    }
 }

@@ -12,16 +12,16 @@ public class TaskSecurity {
         this.taskRepository = taskRepository;
     }
 
-    public boolean isAssignee(String email) {
-        if(email != null) {
-            return taskRepository.existsByAssignee_Email(email);
+    public boolean isAssignee(String email, Long taskId) {
+        if(email != null && taskId != null) {
+            return taskRepository.existsByIdAndAssignee_Email(taskId, email);
         }
         return false;
     }
 
-    public boolean isAuthor(String email) {
-        if(email != null) {
-            return taskRepository.existsByAuthor_Email(email);
+    public boolean isAuthor(String email, Long taskId) {
+        if(email != null && taskId != null) {
+            return taskRepository.existsByIdAndAuthor_Email(taskId, email);
         }
         return false;
     }

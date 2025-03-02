@@ -28,7 +28,7 @@ public class CommentService {
     private final TaskRepository taskRepository;
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and taskSecurity.isAssignee(principal.name)")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @taskSecurity.isAssignee(authentication.name, #commentDto.taskId))")
     public void addComment(CreateCommentDto commentDto, Principal principal) {
         User user = userRepository.findByEmail(principal.getName());
         if(user == null) {

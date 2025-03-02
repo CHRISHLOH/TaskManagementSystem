@@ -153,8 +153,8 @@ public class UserController {
                             array = @ArraySchema(schema = @Schema(implementation = String.class))))
     })
     @PutMapping("/tasks/{id}/status")
-    public ResponseEntity<String> updateTaskStatus(@PathVariable Long id, @RequestBody Map<String, String> requestBody, Principal principal) {
-        taskService.changeTaskStatus(id, Status.fromDisplayName(requestBody.get("status")), principal);
+    public ResponseEntity<String> updateTaskStatus(@PathVariable Long id, @RequestBody Map<String, String> requestBody) {
+        taskService.changeTaskStatus(id, Status.fromDisplayName(requestBody.get("status")));
         return ResponseEntity.ok("Статус изменен");
     }
 
