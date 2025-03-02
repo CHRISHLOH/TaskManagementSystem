@@ -103,7 +103,7 @@ public class TaskService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @taskSecurity.isAuthor(authentication.name, taskId))")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @taskSecurity.isAuthor(authentication.name, #taskId))")
     public void deleteTaskById(Long taskId) {
         if (!taskRepository.existsById(taskId)) {
             log.warn("Task not found for deletion with ID: {}", taskId);
@@ -121,7 +121,7 @@ public class TaskService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER') and @taskSecurity.isAssignee(authentication.name, taskId)")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and @taskSecurity.isAssignee(authentication.name, #taskId))")
     public void changeTaskStatus(Long taskId, Status status) {
         if (!taskRepository.existsById(taskId)) {
             log.warn("Task not found for status change with ID: {}", taskId);
