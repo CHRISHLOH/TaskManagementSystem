@@ -2,7 +2,6 @@ package com.task.management.system.controller;
 
 import com.task.management.system.exception.EntityNotFoundException;
 import com.task.management.system.model.dto.TaskDto;
-import com.task.management.system.service.CommentService;
 import com.task.management.system.service.TaskService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

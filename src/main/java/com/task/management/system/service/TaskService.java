@@ -65,7 +65,7 @@ public class TaskService {
             throw new EntityNotFoundException("task.not.found", taskDto.getId());
         }
         User assignee = userRepository.findById(taskDto.getAssignee().getId())
-                .orElseThrow(() -> new EntityNotFoundException("user.not.found", taskDto.getAssignee().getId()));;
+                .orElseThrow(() -> new EntityNotFoundException("user.not.found", taskDto.getAssignee().getId()));
         try {
             taskFromDb.setTitle(taskDto.getTitle());
             taskFromDb.setDescription(taskDto.getDescription());
