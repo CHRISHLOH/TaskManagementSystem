@@ -175,7 +175,6 @@ public class TaskService {
             if (filter.getStatus() != null) {
                 predicates.add(cb.equal(root.get("status"), Status.fromDisplayName(filter.getStatus())));
             }
-
             if (filter.getPriority() != null) {
                 predicates.add(cb.equal(root.get("priority"), Priority.fromDisplayName(filter.getPriority())));
             }

@@ -2,6 +2,6 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/src/main/resources/db/changelog/dev-0.1.0/db.changelog-003.xml" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/db/changelog/preliquidbase/createdbschema.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/changelog/preliquibase/createdbschema.sql" dialect="PostgreSQL" />
   </component>
 </project>

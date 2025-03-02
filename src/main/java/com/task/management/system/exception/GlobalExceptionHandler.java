@@ -49,7 +49,6 @@ public class GlobalExceptionHandler {
                 "Service error occurred", LocaleContextHolder.getLocale());
         log.error("Service exception: {} with code: {}", message, ex.getMessageCode(), ex);
 
-        // Разрешаем ключ ошибки в текстовое сообщение
         String resolvedError = messageSource.getMessage(
                 ex.getMessageCode(), ex.getArgs(),
                 ex.getMessageCode(), LocaleContextHolder.getLocale());

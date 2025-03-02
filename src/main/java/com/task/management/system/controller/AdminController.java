@@ -2,7 +2,6 @@ package com.task.management.system.controller;
 
 import com.task.management.system.enums.Priority;
 import com.task.management.system.enums.Status;
-import com.task.management.system.model.dto.CommentDto;
 import com.task.management.system.model.dto.CreateCommentDto;
 import com.task.management.system.model.dto.TaskDto;
 import com.task.management.system.model.dto.TaskFilter;
@@ -16,10 +15,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -61,8 +58,12 @@ public class AdminController {
     @Parameters({
             @Parameter(name = "page", description = "Номер страницы", example = "0"),
             @Parameter(name = "size", description = "Размер страницы", example = "10"),
-            @Parameter(name = "status", description = "Статус задачи", schema = @Schema(implementation = Status.class)),
-            @Parameter(name = "priority", description = "Приоритет задачи", schema = @Schema(implementation = Priority.class)),
+            @Parameter(name = "status",
+                    description = "Статус задачи",
+                    schema = @Schema(type = "string", allowableValues = {"В ожидании", "В процессе", "Завершено"})),
+            @Parameter(name = "priority",
+                    description = "Приоритет задачи",
+                    schema = @Schema(type = "string", allowableValues = {"Высокая", "Средняя", "Низкая"})),
             @Parameter(name = "author", description = "Автор задачи", example = "user1"),
             @Parameter(name = "assignee", description = "Исполнитель задачи", example = "user2")
     })
@@ -87,30 +88,32 @@ public class AdminController {
 
     @Operation(summary = "Обновить задачу",
             description = "Обновляет данные существующей задачи")
-    @ApiResponses(value = {@ApiResponse(
-            responseCode = "200",
-            description = "Задача создана",
-            content = {@Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = TaskDto.class)
-            )}
-    )})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Задача обновлена",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = String.class)
+                    )
+            )
+    })
     @PutMapping("/task/edit")
     public ResponseEntity<String> updateTask(@Valid @RequestBody TaskDto taskDto) {
         taskService.editTask(taskDto);
         return ResponseEntity.ok("Задача обновлена");
     }
 
-    @Operation(summary = "Создать задачу",
-            description = "Добавляет новую задачу в систему")
-    @ApiResponses(value = {@ApiResponse(
-            responseCode = "200",
-            description = "Задача создана",
-            content = {@Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = TaskDto.class)
-            )}
-    )})
+    @Operation(
+            summary = "Создать задачу",
+            description = "Добавляет новую задачу в систему"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Задача создана",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = String.class)
+                    )
+            )
+    })
     @PostMapping("/task/create")
     public ResponseEntity<String> addTask(@Valid @RequestBody TaskDto taskDto) {
         log.info(taskDto.toString());
@@ -120,7 +123,11 @@ public class AdminController {
 
     @Operation(summary = "Удалить задачу", description = "Удаляет задачу по её идентификатору")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Задача удалена"),
+            @ApiResponse(responseCode = "200", description = "Задача удалена",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = String.class)
+                    )),
             @ApiResponse(responseCode = "404", description = "Задача не найдена")
     })
     @DeleteMapping("/task/delete/{id}")
@@ -130,18 +137,17 @@ public class AdminController {
     }
 
     @Operation(summary = "Добавить комментарий", description = "Добавляет комментарий к задаче")
-    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {@ApiResponse(
             responseCode = "200",
             description = "Комментарий добавлен",
-            content = {@Content(
+            content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = TaskDto.class)
-            )}
+                    schema = @Schema(implementation = String.class)
+            )
     )})
     @PostMapping("/comment/create")
     public ResponseEntity<String> addComment(@Valid @RequestBody CreateCommentDto commentDto, Principal principal) {
         commentService.addComment(commentDto, principal);
-        return ResponseEntity.ok("Saved");
+        return ResponseEntity.ok("Комментарий добавлен");
     }
 }

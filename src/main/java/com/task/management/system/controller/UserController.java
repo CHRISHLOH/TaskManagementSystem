@@ -2,7 +2,7 @@ package com.task.management.system.controller;
 
 import com.task.management.system.enums.Priority;
 import com.task.management.system.enums.Status;
-import com.task.management.system.model.dto.CommentDto;
+
 import com.task.management.system.model.dto.CreateCommentDto;
 import com.task.management.system.model.dto.TaskDto;
 import com.task.management.system.model.dto.TaskFilter;
@@ -56,40 +56,44 @@ public class UserController {
             description = "Задача создана",
             content = {@Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = TaskDto.class)
+                    schema = @Schema(implementation = String.class)
             )}
     )})
     @PostMapping("/task/create")
     public ResponseEntity<String> createUserTask(@Valid  @RequestBody TaskDto taskDto) {
         taskService.createTask(taskDto);
-        return ResponseEntity.ok("Task created");
+        return ResponseEntity.ok("Задача создана");
     }
 
     @Operation(summary = "Обновить задачу",
             description = "Обновляет данные существующей задачи")
     @ApiResponses(value = {@ApiResponse(
             responseCode = "200",
-            description = "Задача создана",
+            description = "Задача обновлена",
             content = {@Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = TaskDto.class)
+                    schema = @Schema(implementation = String.class)
             )}
     )})
     @PutMapping("/task/edit")
     public ResponseEntity<String> updateUserTask(@Valid @RequestBody TaskDto taskDto) {
         taskService.editTask(taskDto);
-        return ResponseEntity.ok("Task updated");
+        return ResponseEntity.ok("Задача обновлена");
     }
 
     @Operation(summary = "Удалить задачу", description = "Удаляет задачу по её идентификатору")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Задача удалена"),
+            @ApiResponse(responseCode = "200", description = "Задача удалена",
+                    content = {@Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = String.class)
+                    )}),
             @ApiResponse(responseCode = "404", description = "Задача не найдена")
     })
     @DeleteMapping("/task/{id}")
     public ResponseEntity<String> deleteUserTask(@PathVariable Long id) {
         taskService.deleteTaskById(id);
-        return ResponseEntity.ok("Task deleted");
+        return ResponseEntity.ok("Задача удалена");
     }
 
     @Operation(summary = "Получить все задачи пользователя",
@@ -103,7 +107,7 @@ public class UserController {
             @Parameter(name = "priority",
                     description = "Приоритет задачи",
                     schema = @Schema(type = "string", allowableValues = {"Высокая", "Средняя", "Низкая"})),
-            @Parameter(name = "assignee", description = "Исполнитель задачи", example = "user2")
+            @Parameter(name = "assignee", description = "Исполнитель задачи", example = "user@mail.ru")
     })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Список задач успешно возвращен",
@@ -130,14 +134,14 @@ public class UserController {
             description = "Добавляет новый комментарий к задаче. Комментарий не может быть пустым, taskId обязательное поле."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Комментапий добавлен",
+            @ApiResponse(responseCode = "200", description = "Комментарий добавлен",
                     content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = CommentDto.class))))
+                            array = @ArraySchema(schema = @Schema(implementation = String.class))))
     })
     @PostMapping("/comment/create")
     public ResponseEntity<String> addComment(@Valid @RequestBody CreateCommentDto commentDto, Principal principal) {
         commentService.addComment(commentDto, principal);
-        return ResponseEntity.ok("Saved");
+        return ResponseEntity.ok("Комментарий добавлен");
     }
 
     @Operation(
@@ -147,12 +151,12 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Статус изменен",
                     content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = TaskDto.class))))
+                            array = @ArraySchema(schema = @Schema(implementation = String.class))))
     })
     @PutMapping("/tasks/{id}/status")
     public ResponseEntity<String> updateTaskStatus(@PathVariable Long id, @RequestBody Map<String, String> requestBody, Principal principal) {
         taskService.changeTaskStatus(id, Status.fromDisplayName(requestBody.get("status")), principal);
-        return ResponseEntity.ok("Status updated");
+        return ResponseEntity.ok("Статус изменен");
     }
 
     @Operation(summary = "Получить все задачи",
@@ -160,10 +164,14 @@ public class UserController {
     @Parameters({
             @Parameter(name = "page", description = "Номер страницы", example = "0"),
             @Parameter(name = "size", description = "Размер страницы", example = "10"),
-            @Parameter(name = "status", description = "Статус задачи", schema = @Schema(implementation = Status.class)),
-            @Parameter(name = "priority", description = "Приоритет задачи", schema = @Schema(implementation = Priority.class)),
-            @Parameter(name = "author", description = "Автор задачи", example = "user1"),
-            @Parameter(name = "assignee", description = "Исполнитель задачи", example = "user2")
+            @Parameter(name = "status",
+                    description = "Статус задачи",
+                    schema = @Schema(type = "string", allowableValues = {"В ожидании", "В процессе", "Завершено"})),
+            @Parameter(name = "priority",
+                    description = "Приоритет задачи",
+                    schema = @Schema(type = "string", allowableValues = {"Высокая", "Средняя", "Низкая"})),
+            @Parameter(name = "author", description = "Автор задачи", example = "user@mail.ru"),
+            @Parameter(name = "assignee", description = "Исполнитель задачи", example = "user@mail.ru")
     })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Список задач успешно возвращен",
