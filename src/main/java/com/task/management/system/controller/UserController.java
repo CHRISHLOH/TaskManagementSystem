@@ -1,6 +1,5 @@
 package com.task.management.system.controller;
 
-import com.task.management.system.enums.Priority;
 import com.task.management.system.enums.Status;
 
 import com.task.management.system.model.dto.CreateCommentDto;
